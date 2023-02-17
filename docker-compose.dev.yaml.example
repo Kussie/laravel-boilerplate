@@ -1,0 +1,9 @@
+# Special file to allow developers to override certain aspects to improve workflow.
+# Such as allowing live editing of clinical blocks in the example below
+#
+#version: '3.8'
+#services:
+#  app:
+#    volumes:
+#      - /development/personal/quark-document-reader-parsers:/app/vendor/shakewell/quark-document-reader-parsers
+version: '3.8'

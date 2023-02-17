@@ -1,0 +1,31 @@
+name: Deploy to Vapor Production
+on:
+  push:
+    branches: [ master, main ]
+jobs:
+  deploy:
+    name: Deploy to Vapor Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP with composer v2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: composer:v2, cs2pr
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Validate Composer
+        run: composer validate
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-suggest --no-dev
+      - name: Deploy code
+        run: ./vendor/bin/vapor deploy docker-production --commit="${{ github.sha }}"
+        env:
+          APP_ENV: 'production'
+          VAPOR_API_TOKEN: ${{ secrets.VAPOR_API_TOKEN }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Logs
+          path: ./storage/logs

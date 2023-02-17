@@ -1,0 +1,20 @@
+id: 36151
+name: Standards-Australia-POC
+environments:
+  production:
+    storage: standards-australia-production-vapor
+    database: standards-australia-production-vapor
+    domain: sa.shakewell.click
+    memory: 1024
+    cli-memory: 512
+    timeout: 20
+    runtime: docker
+    queues:
+      - emails
+      - package_analysis
+      - package_processing
+      - package_events
+    build:
+      - 'composer install --no-dev'
+      - 'php artisan event:cache'
+      # - 'npm ci && npm run build && rm -rf node_modules'

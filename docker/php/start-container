@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+if [ ! -z "$NOVA_EMAIL" && ! -z "$NOVA_LICENSE_KEY" ]; then
+    echo "Configuring Composer"
+    composer config http-basic.nova.laravel.com $NOVA_EMAIL $NOVA_LICENSE_KEY
+fi
+
+
+echo "Installing Package Dependencies"
+composer install
+
+echo "Running database migrations"
+php artisan migrate
+
+echo "Linking Storage"
+php artisan storage:link
+
+echo "Generating IDE Helper Stubs"
+php artisan ide-helper:generate
+php artisan ide-helper:models --nowrite
+
+echo "Fixing File Permissions"
+chown -R 1000:1000 .
+
+if [ $# -gt 0 ]; then
+    exec gosu $WWWUSER "$@"
+else
+    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi
